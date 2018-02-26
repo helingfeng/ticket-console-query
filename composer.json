@@ -1,0 +1,21 @@
+{
+  "name": "helingfeng/ticket-helper",
+  "authors": [
+    {
+      "name": "helingfeng",
+      "email": "dreamhelingfeng@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Ticket\\": "src/Ticket/"
+    }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    }
+  }
+}
