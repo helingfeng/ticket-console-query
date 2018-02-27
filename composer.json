@@ -6,7 +6,9 @@
       "email": "dreamhelingfeng@gmail.com"
     }
   ],
-  "require": {},
+  "require": {
+    "guzzlehttp/guzzle": "^6.3"
+  },
   "autoload": {
     "psr-4": {
       "Ticket\\": "src/Ticket/"

@@ -4,4 +4,4 @@ require_once './vendor/autoload.php';
 
 $ticket = new Ticket\Ticket();
 
-$ticket->hello();
+$ticket->queryTickets('BJP','SHH','2018-02-28');
