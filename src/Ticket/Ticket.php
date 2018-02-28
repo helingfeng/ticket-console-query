@@ -8,8 +8,16 @@ use GuzzleHttp\Psr7\Request;
 class Ticket
 {
 
+    /**
+     * 客户端
+     * @var Client|null
+     */
     protected $client = null;
 
+    /**
+     * 余票接口链接
+     * @var string
+     */
     protected $queryTicketUrl = 'https://kyfw.12306.cn/otn/leftTicket/queryZ';
 
     public function __construct()
@@ -17,6 +25,15 @@ class Ticket
         $this->client = new Client();
     }
 
+    /**
+     * 余票查询
+     *
+     * @param $from_station
+     * @param $to_station
+     * @param $format_date
+     * @param string $purpose_codes
+     * @return array|bool
+     */
     public function queryTickets($from_station, $to_station, $format_date, $purpose_codes = 'ADULT')
     {
         $parameters = [
@@ -30,6 +47,7 @@ class Ticket
         $code = $response->getStatusCode();
         $body = $response->getBody();
 
+        // 接口调用成功
         if ($code == 200) {
             $result = json_decode($body, true);
             $train_str_arr = $result['data']['result'];
@@ -39,11 +57,15 @@ class Ticket
             }
             return $trains;
         }
-
         return false;
-
     }
 
+    /**
+     * 格式化字符串转对象
+     *
+     * @param $string
+     * @return array
+     */
     protected function formatTrainString($string)
     {
         //|23:00-06:00系统维护时间|240000G1010D|G101|VNP|AOH|VNP|AOH|06:43|12:39|05:56|IS_TIME_NOT_BUY|m6x834Y1%2Fdp%2BurLu8dI6uYsKPCOZsDpYJLqIvIE9cY2orkrX

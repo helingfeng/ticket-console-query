@@ -5,6 +5,10 @@ namespace Ticket;
 
 class Train
 {
+    /**
+     * 座位映射
+     * @var array
+     */
     public static $seatsMapping = [
         'swz_num' => '商务座',
         'tz_num' => '特等座',
@@ -19,6 +23,10 @@ class Train
         'qt_num' => '其它'
     ];
 
+    /**
+     * 车票类型映射
+     * @var array
+     */
     public static $purposeCodes = [
         'ADULT' => '普通票',
         '0X00' => '学生票'
