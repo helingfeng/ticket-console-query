@@ -5,7 +5,7 @@ TicketHelper.
 基于`PHP`开发一个12306车票助手程序.
 
 
-### 项目相关博客
+### Blog
 
 博客地址: https://www.helingfeng.com
 
