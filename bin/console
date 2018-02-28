@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+require_once './vendor/autoload.php';
+
+use \Symfony\Component\Console\Application;
+use \Command\TicketQueryCommand;
+
+$application = new Application();
+
+$application->add(new TicketQueryCommand());
+
+try {
+    $application->run();
+} catch (\Exception $exception) {
+    echo 'running error.';
+}

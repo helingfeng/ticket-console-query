@@ -41,6 +41,7 @@ class Ticket
         }
 
         return false;
+
     }
 
     protected function formatTrainString($string)
@@ -90,8 +91,8 @@ class Ticket
         $train['seat_types'] = $arr[35];
 
         $stations = new Stations();
-        $train['from_station_name'] = $stations->getStationName($arr[6]);
-        $train['to_station_name'] = $stations->getStationName($arr[7]);
+        $train['from_station_name'] = $stations->stationCode2Name($arr[6]);
+        $train['to_station_name'] = $stations->stationCode2Name($arr[7]);
 
         $data['queryLeftNewDTO'] = $train;
         return $data;

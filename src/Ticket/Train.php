@@ -19,4 +19,9 @@ class Train
         'qt_num' => '其它'
     ];
 
+    public static $purposeCodes = [
+        'ADULT' => '普通票',
+        '0X00' => '学生票'
+    ];
+
 }
