@@ -23,6 +23,6 @@ TicketHelper.
 
 ### License
 
-TIM
+This library is published under The MIT License.
 
 ### Thanks
