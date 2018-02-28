@@ -4,7 +4,16 @@ TicketHelper.
 
 基于`PHP`开发一个12306车票助手程序.
 
+
+### 项目相关博客
+
+博客地址: https://www.helingfeng.com
+
+- [https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/](https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/ "https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/")
+- [https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/](https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/ "https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/")
+
 ---
+
 
 ### Feature
 
