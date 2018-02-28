@@ -17,5 +17,10 @@ class Stations
 
     }
 
+    public function getStationName($code)
+    {
+        return '';
+    }
+
 
 }
