@@ -61,7 +61,7 @@ php bin/console ticket:quick-query 北京 上海 2018-02-28
 ```shell
  php bin/console ticket:quick-query --help
 ```
-![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_043.png)
+![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_044.png)
 
 ...
 
