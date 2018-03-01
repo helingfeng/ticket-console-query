@@ -8,7 +8,6 @@
   ],
   "require": {
     "guzzlehttp/guzzle": "^6.3",
-    "mathieuviossat/arraytotexttable": "~1.0.0",
     "symfony/console": "^3.4"
   },
   "autoload": {

@@ -91,7 +91,7 @@ class Stations
      */
     protected function init()
     {
-        $stations_name_string = file_get_contents(__DIR__ . '/stations.data');
+        $stations_name_string = file_get_contents(getcwd() . '/public/stations.data');
         // @bjb|北京北|VAP|beijingbei|bjb
         $stations_name_arr = explode('|', $stations_name_string);
         $num = count($stations_name_arr);

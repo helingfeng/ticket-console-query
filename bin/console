@@ -5,10 +5,12 @@ require_once './vendor/autoload.php';
 
 use \Symfony\Component\Console\Application;
 use \Command\TicketQueryCommand;
+use \Command\GetPassengersCommand;
 
 $application = new Application();
 
 $application->add(new TicketQueryCommand());
+$application->add(new GetPassengersCommand());
 
 try {
     $application->run();

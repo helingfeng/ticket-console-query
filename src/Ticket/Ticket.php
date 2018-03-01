@@ -20,9 +20,33 @@ class Ticket
      */
     protected $queryTicketUrl = 'https://kyfw.12306.cn/otn/leftTicket/queryZ';
 
+    /**
+     * 获取验证码图片
+     * @var string
+     */
+    protected $captchaImageUrl = 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand';
+
+    /**
+     * 校验图片验证码
+     * @var string
+     */
+    protected $captchaCheckUrl = 'https://kyfw.12306.cn/passport/captcha/captcha-check';
+
+    /**
+     * 登录验证URL
+     * @var string
+     */
+    protected $webLoginUrl = 'https://kyfw.12306.cn/passport/web/login';
+
+    /**
+     * 常用联系人列表链接
+     * @var string
+     */
+    protected $passengersUrl = "https://kyfw.12306.cn/otn/passengers/init";
+
     public function __construct()
     {
-        $this->client = new Client();
+        $this->client = new Client(['cookies' => true]);
     }
 
     /**
@@ -52,12 +76,100 @@ class Ticket
             $result = json_decode($body, true);
             $train_str_arr = $result['data']['result'];
             $trains = [];
-            foreach ($train_str_arr as $train_str) {
-                array_push($trains,$this->formatTrainString($train_str));
+            if (is_array($train_str_arr)) {
+                foreach ($train_str_arr as $train_str) {
+                    array_push($trains, $this->formatTrainString($train_str));
+                }
             }
             return $trains;
+        } else {
+            throw new \RuntimeException('查询接口异常.');
         }
-        return false;
+    }
+
+    public function generateCaptcha()
+    {
+        $request = new Request('GET', $this->captchaImageUrl);
+        $response = $this->client->send($request);
+        if ($response->getStatusCode() == 200) {
+            file_put_contents(getcwd() . '/public/captcha/' . date('Y-m-d-H-i-s') . '.jpg', $response->getBody());
+        } else {
+            throw new \RuntimeException('验证码图片获取异常');
+        }
+    }
+
+    public function checkCaptcha($answers = [])
+    {
+        $answer_location_arr = [];
+        foreach ($answers as $answer) {
+            array_push($answer_location_arr, $this->getCaptchaLocation($answer));
+        }
+        $parameters = ['form_params' => [
+            'answer' => implode(',', $answer_location_arr),
+            'rand' => 'sjrand',
+            'login_site' => 'E',
+        ]];
+        $response = $this->client->post($this->captchaCheckUrl, $parameters);
+        if ($response->getStatusCode() == 200) {
+            $result = json_decode($response->getBody(), true);
+            return $result;
+        } else {
+            throw new \RuntimeException('验证码校验接口异常');
+        }
+    }
+
+    public function webLogin()
+    {
+        $file_path = getcwd() . '/auth.json';
+        if (!is_file($file_path)) {
+            throw new \RuntimeException('请在根目录创建auth.json文件。');
+        }
+        $auth_string = file_get_contents($file_path);
+        $auth = json_decode($auth_string, true);
+
+        $parameters = ['form_params' => [
+            'username' => $auth['username'],
+            'password' => $auth['password'],
+            'appid' => 'otn',
+        ]];
+        $response = $this->client->post($this->webLoginUrl, $parameters);
+        if ($response->getStatusCode() == 200) {
+            $result = json_decode($response->getBody(), true);
+            return $result;
+        } else {
+            throw new \RuntimeException('登录验证接口异常');
+        }
+    }
+
+    public function getPassengers()
+    {
+        $response = $this->client->post($this->passengersUrl);
+        if ($response->getStatusCode() == 200) {
+
+            file_put_contents('123',$response->getBody());
+
+            if(strpos($response->getBody(),'err_bot')){
+                return false;
+            }else{
+                $preg= "/passengers=(.*);/is";
+                preg_match($preg,$response->getBody(),$matches);
+                throw new \RuntimeException(json_encode($matches,JSON_UNESCAPED_UNICODE));
+
+            }
+        } else {
+            throw new \RuntimeException('获取乘客信息页面打开异常.');
+        }
+    }
+
+    protected function getCaptchaLocation($index)
+    {
+        // 76*76 正方形图片块
+        $index = intval($index) % 9;
+        if ($index > 4) {
+            return implode(',', [76 * ($index - 4) - 38, 76 + 38]);
+        } else {
+            return implode(',', [76 * $index - 38, 38]);
+        }
     }
 
     /**

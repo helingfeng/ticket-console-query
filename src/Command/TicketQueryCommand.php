@@ -5,8 +5,8 @@
 
 namespace Command;
 
-use MathieuViossat\Util\ArrayToTextTable;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,7 +29,7 @@ class TicketQueryCommand extends Command
             // the full command description shown when running the command with
             // the "--help" option
             // 运行命令时使用 "--help" 选项时的完整命令描述
-            ->setHelp("This command allows you to create users...")
+            ->setHelp("This command allows you to query ticket...")
             // from station
             ->addArgument('from_station', InputArgument::REQUIRED, '余票列车起点车站?')
             // from station
@@ -81,27 +81,28 @@ class TicketQueryCommand extends Command
             $seat['rz_num'] = $train['queryLeftNewDTO']['rz_num'];
             $seat['tz_num'] = $train['queryLeftNewDTO']['tz_num'];
             $seat['wz_num'] = $train['queryLeftNewDTO']['wz_num'];
-            $seat['yb_num'] = $train['queryLeftNewDTO']['yb_num'];
             $seat['yw_num'] = $train['queryLeftNewDTO']['yw_num'];
             $seat['yz_num'] = $train['queryLeftNewDTO']['yz_num'];
             $seat['ze_num'] = $train['queryLeftNewDTO']['ze_num'];
             $seat['zy_num'] = $train['queryLeftNewDTO']['zy_num'];
             $seat['swz_num'] = $train['queryLeftNewDTO']['swz_num'];
 
-            foreach ($seat as &$s) {
-                switch ($s) {
-                    case '无':
-                        $s = 'No';
-                        break;
-                    case '有':
-                        $s = 'Yes';
-                        break;
-                }
-            }
             array_push($t, $seat);
         }
 
-        $renderer = new ArrayToTextTable($t);
-        $output->write($renderer->getTable());
+        $heading = [];
+        if (!empty($t[0])) {
+            foreach (array_keys($t[0]) as $item) {
+                if (array_key_exists($item, Train::$seatsMapping)) {
+                    array_push($heading, Train::$seatsMapping[$item]);
+                } else {
+                    array_push($heading, $item);
+                }
+            }
+        }
+        $table = new Table($output);
+        $table->setHeaders($heading)->setRows($t);
+        $table->render();
+
     }
 }
