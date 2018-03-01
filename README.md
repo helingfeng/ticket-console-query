@@ -59,15 +59,9 @@ php bin/console ticket:quick-query 北京 上海 2018-02-28
 余票查询帮助
 
 ```shell
-Arguments:
-  from_station          余票列车起点车站?
-  to_station            余票列车终点车站?
-  date                  余票查询日期[Y-m-d]?
-
-Options:
-      --code=CODE       车票类型，普通票/学生票? [default: "普通票"]
-
+ php bin/console ticket:quick-query --help
 ```
+![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_043.png)
 
 ...
 
