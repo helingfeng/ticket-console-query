@@ -8,7 +8,12 @@
   ],
   "require": {
     "guzzlehttp/guzzle": "^6.3",
-    "symfony/console": "^3.4"
+    "symfony/yaml":"3.3.16",
+    "symfony/dependency-injection":"3.3.9",
+    "symfony/console":"3.0",
+    "jonnyw/php-phantomjs": "4.*",
+    "symfony/dom-crawler": "^3.4",
+    "symfony/css-selector": "^3.4"
   },
   "autoload": {
     "psr-4": {

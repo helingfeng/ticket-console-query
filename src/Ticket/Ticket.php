@@ -3,16 +3,30 @@
 namespace Ticket;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Psr7\Request;
 
 class Ticket
 {
 
     /**
-     * 客户端
+     * guzzle 客户端
      * @var Client|null
      */
     protected $client = null;
+
+    /**
+     * phantom 浏览器
+     * @var null|Browser
+     */
+    protected $browser = null;
+
+    /**
+     * cookies 文件
+     * @var FileCookieJar|null
+     */
+    protected $cookieJar = null;
 
     /**
      * 余票接口链接
@@ -39,14 +53,27 @@ class Ticket
     protected $webLoginUrl = 'https://kyfw.12306.cn/passport/web/login';
 
     /**
+     * @var string
+     */
+    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin';
+
+    /**
+     * 登出URL
+     * @var string
+     */
+    protected $webLogoutUrl = 'https://kyfw.12306.cn/otn/login/loginOut';
+
+    /**
      * 常用联系人列表链接
      * @var string
      */
-    protected $passengersUrl = "https://kyfw.12306.cn/otn/passengers/init";
+    protected $passengersUrl = "https://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs";
 
     public function __construct()
     {
-        $this->client = new Client(['cookies' => true]);
+        $this->cookieJar = new CookieJar();
+        $this->client = new  Client(['cookies' => $this->cookieJar]);
+        $this->browser = new Browser();
     }
 
     /**
@@ -141,24 +168,30 @@ class Ticket
         }
     }
 
+    public function webLogout()
+    {
+        $response = $this->client->get($this->webLogoutUrl);
+        if ($response->getStatusCode() == 200) {
+            return true;
+        } else {
+            throw new \RuntimeException('登录验证接口异常');
+        }
+    }
+
+    public function userLogin()
+    {
+        $cookies = [];
+        foreach ($this->cookieJar->toArray() as $cookie) {
+            $cookies[] = $cookie['Name'] . '=' . $cookie['Value'];
+        }
+        $response = $this->browser->get($this->userLoginUrl, ['cookie' => implode('; ', $cookies)]);
+        return $response;
+    }
+
     public function getPassengers()
     {
-        $response = $this->client->post($this->passengersUrl);
-        if ($response->getStatusCode() == 200) {
-
-            file_put_contents('123',$response->getBody());
-
-            if(strpos($response->getBody(),'err_bot')){
-                return false;
-            }else{
-                $preg= "/passengers=(.*);/is";
-                preg_match($preg,$response->getBody(),$matches);
-                throw new \RuntimeException(json_encode($matches,JSON_UNESCAPED_UNICODE));
-
-            }
-        } else {
-            throw new \RuntimeException('获取乘客信息页面打开异常.');
-        }
+        $response = $this->browser->get($this->passengersUrl);
+        return $response['content'];
     }
 
     protected function getCaptchaLocation($index)

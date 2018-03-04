@@ -5,14 +5,18 @@
 
 namespace Command;
 
-use MathieuViossat\Util\ArrayToTextTable;
+use JonnyW\PhantomJs\Client;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\DomCrawler\Crawler;
+use Ticket\Browser;
 use Ticket\Stations;
 use Ticket\Ticket;
 use Ticket\Train;
@@ -42,7 +46,7 @@ class GetPassengersCommand extends Command
         $question = new Question('请输入验证码答案:', '1');
         $question->setValidator(function ($answer) use ($ticket, $output) {
             $result = $ticket->checkCaptcha(explode(',', $answer));
-            $output->writeln('接口返回:'.$result['result_message']);
+            $output->writeln('接口返回:' . $result['result_message']);
             if ($result['result_code'] != 4) {
                 $ticket->generateCaptcha();
                 throw new \RuntimeException('验证码不正确');
@@ -55,18 +59,38 @@ class GetPassengersCommand extends Command
         $helper->ask($input, $output, $question);
 
         $result = $ticket->webLogin();
-        $output->writeln('接口返回:'.json_encode($result,JSON_UNESCAPED_UNICODE));
+        $output->writeln('登录接口返回:' . json_encode($result, JSON_UNESCAPED_UNICODE));
 
-//        if ($result['result_code'] == 4) {
-//            // ...
-//
-//        }
+        $output->writeln('进行回调...');
+        $response = $ticket->userLogin();
+        $output->writeln('登录回调状态：' . $response['http_code']);
 
-        while ($ticket->getPassengers() == false){
+        file_put_contents('login',$response['content']);
 
-            $question = new ConfirmationQuestion('网络频繁，是否继续访问？');
-            $helper->ask($input, $output, $question);
+        $output->writeln('正在获取乘客信息...');
+        $passengers_html = $ticket->getPassengers();
+
+        file_put_contents('passenger',$passengers_html);
+
+        $crawler = new Crawler($passengers_html);
+        $crawler = $crawler->filter('body > pre');
+
+
+        $passengers = json_decode($crawler->text(),true);
+        $passengers = $passengers['data']['normal_passengers'];
+
+        if(!empty($passengers)){
+            $output->writeln('乘客信息列表:');
+            $heading = array_keys(current($passengers));
+            $table = new Table($output);
+            $table->setHeaders($heading)->setRows($passengers);
+            $table->render();
+        }else{
+            $output->writeln('无法获取乘客信息或为空.');
         }
-
+//
+//        $output->writeln('正在退出...');
+//        $ticket->webLogout();
+//        $output->writeln('完成登出.');
     }
 }
