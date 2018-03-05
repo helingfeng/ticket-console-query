@@ -1,3 +1,7 @@
 .svn
 .idea
 /vendor/
+auth.json
+cookies
+login
+passenger

@@ -3,7 +3,6 @@
 namespace Ticket;
 
 use JonnyW\PhantomJs\Client;
-use JonnyW\PhantomJs\Http\Response;
 
 class Browser
 {
@@ -15,7 +14,7 @@ class Browser
 
     protected $response = null;
 
-    public function __construct($timeout = 300000, $lazy = true)
+    public function __construct($timeout = 60000, $lazy = true)
     {
         $this->client = Client::getInstance();
         $this->client->getEngine()->setPath('/usr/bin/phantomjs');

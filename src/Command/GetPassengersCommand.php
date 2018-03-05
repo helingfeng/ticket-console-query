@@ -61,9 +61,12 @@ class GetPassengersCommand extends Command
         $result = $ticket->webLogin();
         $output->writeln('登录接口返回:' . json_encode($result, JSON_UNESCAPED_UNICODE));
 
+        $ticket->webLogout();
+
         $output->writeln('进行回调...');
         $response = $ticket->userLogin();
         $output->writeln('登录回调状态：' . $response['http_code']);
+
 
         file_put_contents('login',$response['content']);
 
@@ -79,18 +82,29 @@ class GetPassengersCommand extends Command
         $passengers = json_decode($crawler->text(),true);
         $passengers = $passengers['data']['normal_passengers'];
 
+
         if(!empty($passengers)){
             $output->writeln('乘客信息列表:');
-            $heading = array_keys(current($passengers));
+            $heading = ['passenger_name','sex_name','mobile_no','born_date','passenger_id_no','passenger_type_name'];
             $table = new Table($output);
-            $table->setHeaders($heading)->setRows($passengers);
+            $rows = [];
+            foreach ($passengers as $passenger){
+                $rows[] = [
+                    $passenger['passenger_name'],
+                    $passenger['sex_name'],
+                    $passenger['mobile_no'],
+                    $passenger['born_date'],
+                    $passenger['passenger_id_no'],
+                    $passenger['passenger_type_name'],
+                ];
+            }
+            $table->setHeaders($heading)->setRows($rows);
             $table->render();
         }else{
             $output->writeln('无法获取乘客信息或为空.');
         }
-//
-//        $output->writeln('正在退出...');
-//        $ticket->webLogout();
-//        $output->writeln('完成登出.');
+
+        $output->writeln('正在退出...');
+        $output->writeln('完成登出.');
     }
 }

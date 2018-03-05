@@ -19,8 +19,7 @@ TicketHelper.
 
 - 余票查询 
 - 验证登录
-- 订单查询（开发中）
-- 账号客户信息获取（开发中）
+- 账号客户信息获取
 - 配置抢票任务（规划中）
 
 ### Installation
@@ -36,6 +35,12 @@ TicketHelper.
 composer install
 ```
 
+```shell
+cp auth.json.example auth.json
+
+# 修改配置文件
+```
+
 ### Usage
 
 ```shell
@@ -49,14 +54,14 @@ Available commands:
   ticket:quick-query  查询12306列车余票信息.
 ```
 
-余票查询命令
+##### 余票查询命令
 
 ```shell
 php bin/console ticket:quick-query 北京 上海 2018-02-28
 ```
 ![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_042.png)
 
-余票查询帮助
+参数说明
 
 ```shell
  php bin/console ticket:quick-query --help
@@ -64,6 +69,24 @@ php bin/console ticket:quick-query 北京 上海 2018-02-28
 ![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_044.png)
 
 ...
+
+
+##### 乘客信息查询
+
+```shell
+php bin/console ticket:get-passengers
+
+
+请输入验证码答案:1
+接口返回:验证码校验成功
+登录接口返回:{"result_message":"登录成功","result_code":0,"uamtk":"onnUQw2Eaa15cYljgRaRZ7yDjCBF3BFDqbj5IeeUZ"}
+进行回调...
+登录回调状态：200
+正在获取乘客信息...
+乘客信息列表:
+```
+![](https://www.helingfeng.com/wp-content/uploads/2018/03/Selection_045.png)
+
 
 ### License
 

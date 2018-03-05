@@ -3,7 +3,6 @@
 namespace Ticket;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Psr7\Request;
 
@@ -55,7 +54,8 @@ class Ticket
     /**
      * @var string
      */
-    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin';
+    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/login/init';
+//    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin';
 
     /**
      * 登出URL
@@ -71,8 +71,9 @@ class Ticket
 
     public function __construct()
     {
-        $this->cookieJar = new CookieJar();
+        $this->cookieJar = new FileCookieJar(getcwd() . '/public/cookies/session', true);
         $this->client = new  Client(['cookies' => $this->cookieJar]);
+
         $this->browser = new Browser();
     }
 
@@ -184,7 +185,8 @@ class Ticket
         foreach ($this->cookieJar->toArray() as $cookie) {
             $cookies[] = $cookie['Name'] . '=' . $cookie['Value'];
         }
-        $response = $this->browser->get($this->userLoginUrl, ['cookie' => implode('; ', $cookies)]);
+        file_put_contents('cookies',implode('; ', $cookies));
+        $response = $this->browser->get($this->userLoginUrl, ['Cookie' => implode('; ', $cookies)]);
         return $response;
     }
 
