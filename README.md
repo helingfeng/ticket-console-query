@@ -79,7 +79,7 @@ php bin/console ticket:get-passengers
 
 请输入验证码答案:1
 接口返回:验证码校验成功
-登录接口返回:{"result_message":"登录成功","result_code":0,"uamtk":"onnUQw2Eaa15cYljgRaRZ7yDjCBF3BFDqbj5IeeUZ"}
+登录接口返回:登录成功
 进行回调...
 登录回调状态：200
 正在获取乘客信息...
