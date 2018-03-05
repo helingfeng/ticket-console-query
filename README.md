@@ -24,16 +24,19 @@ TicketHelper.
 
 ### Installation
 
-环境要求
+1.首先安装
 
 - PHP7
 - Composer
+- Phantomjs
 
-依赖包安装
+2.加载依赖
 
 ```shell
 composer install
 ```
+
+3.配置参数
 
 ```shell
 cp auth.json.example auth.json
