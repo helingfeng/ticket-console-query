@@ -2,10 +2,6 @@
 
 namespace Ticket;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\FileCookieJar;
-use GuzzleHttp\Psr7\Request;
-
 class Ticket
 {
 
