@@ -16,76 +16,16 @@ class Ticket
     protected $client = null;
 
     /**
-     * phantom 浏览器
-     * @var null|Browser
-     */
-    protected $browser = null;
-
-    /**
-     * cookies 文件
-     * @var FileCookieJar|null
-     */
-    protected $cookieJar = null;
-
-    /**
      * 余票接口链接
      * @var string
      */
     protected $queryTicketUrl = 'https://kyfw.12306.cn/otn/leftTicket/queryZ';
 
-    /**
-     * 获取验证码图片
-     * @var string
-     */
-    protected $captchaImageUrl = 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand';
-
-    /**
-     * 校验图片验证码
-     * @var string
-     */
-    protected $captchaCheckUrl = 'https://kyfw.12306.cn/passport/captcha/captcha-check';
-
-    /**
-     * 登录验证URL
-     * @var string
-     */
-    protected $webLoginUrl = 'https://kyfw.12306.cn/passport/web/login';
-
-    /**
-     * @var string
-     */
-    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/login/init';
-//    protected $userLoginUrl = 'https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin';
-
-    /**
-     * 登出URL
-     * @var string
-     */
-    protected $webLogoutUrl = 'https://kyfw.12306.cn/otn/login/loginOut';
-
-    /**
-     * 常用联系人列表链接
-     * @var string
-     */
-    protected $passengersUrl = "https://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs";
-
     public function __construct()
     {
-        $this->cookieJar = new FileCookieJar(getcwd() . '/public/cookies/session', true);
-        $this->client = new  Client(['cookies' => $this->cookieJar]);
-
-        $this->browser = new Browser();
+        $this->client = new  Client();
     }
 
-    /**
-     * 余票查询
-     *
-     * @param $from_station
-     * @param $to_station
-     * @param $format_date
-     * @param string $purpose_codes
-     * @return array|bool
-     */
     public function queryTickets($from_station, $to_station, $format_date, $purpose_codes = 'ADULT')
     {
         $parameters = [
@@ -115,99 +55,7 @@ class Ticket
         }
     }
 
-    public function generateCaptcha()
-    {
-        $request = new Request('GET', $this->captchaImageUrl);
-        $response = $this->client->send($request);
-        if ($response->getStatusCode() == 200) {
-            file_put_contents(getcwd() . '/public/captcha/' . date('Y-m-d-H-i-s') . '.jpg', $response->getBody());
-        } else {
-            throw new \RuntimeException('验证码图片获取异常');
-        }
-    }
-
-    public function checkCaptcha($answers = [])
-    {
-        $answer_location_arr = [];
-        foreach ($answers as $answer) {
-            array_push($answer_location_arr, $this->getCaptchaLocation($answer));
-        }
-        $parameters = ['form_params' => [
-            'answer' => implode(',', $answer_location_arr),
-            'rand' => 'sjrand',
-            'login_site' => 'E',
-        ]];
-        $response = $this->client->post($this->captchaCheckUrl, $parameters);
-        if ($response->getStatusCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            return $result;
-        } else {
-            throw new \RuntimeException('验证码校验接口异常');
-        }
-    }
-
-    public function webLogin()
-    {
-        $file_path = getcwd() . '/auth.json';
-        if (!is_file($file_path)) {
-            throw new \RuntimeException('请在根目录创建auth.json文件。');
-        }
-        $auth_string = file_get_contents($file_path);
-        $auth = json_decode($auth_string, true);
-
-        $parameters = ['form_params' => [
-            'username' => $auth['username'],
-            'password' => $auth['password'],
-            'appid' => 'otn',
-        ]];
-        $response = $this->client->post($this->webLoginUrl, $parameters);
-        if ($response->getStatusCode() == 200) {
-            $result = json_decode($response->getBody(), true);
-            return $result;
-        } else {
-            throw new \RuntimeException('登录验证接口异常');
-        }
-    }
-
-    public function webLogout()
-    {
-        $response = $this->client->get($this->webLogoutUrl);
-        if ($response->getStatusCode() == 200) {
-            return true;
-        } else {
-            throw new \RuntimeException('登录验证接口异常');
-        }
-    }
-
-    public function userLogin()
-    {
-        $cookies = [];
-        foreach ($this->cookieJar->toArray() as $cookie) {
-            $cookies[] = $cookie['Name'] . '=' . $cookie['Value'];
-        }
-        file_put_contents('cookies',implode('; ', $cookies));
-        $response = $this->browser->get($this->userLoginUrl, ['Cookie' => implode('; ', $cookies)]);
-        return $response;
-    }
-
-    public function getPassengers()
-    {
-        $response = $this->browser->get($this->passengersUrl);
-        return $response['content'];
-    }
-
-    protected function getCaptchaLocation($index)
-    {
-        // 76*76 正方形图片块
-        $index = intval($index) % 9;
-        if ($index > 4) {
-            return implode(',', [76 * ($index - 4) - 38, 76 + 38]);
-        } else {
-            return implode(',', [76 * $index - 38, 38]);
-        }
-    }
-
-    /**
+  /**
      * 格式化字符串转对象
      *
      * @param $string

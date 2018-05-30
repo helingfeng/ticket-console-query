@@ -1,47 +1,10 @@
-## 12306 车票助手
+## 12306 余票查询工具
 
-TicketHelper.
-
-基于`PHP`开发一个12306车票助手程序.
-
-
-### Blog
-
-博客地址: https://www.helingfeng.com
-
-- [https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/](https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/ "https://www.helingfeng.com/2018/02/18/12306-%E4%BD%99%E7%A5%A8%E6%9F%A5%E8%AF%A2/")
-- [https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/](https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/ "https://www.helingfeng.com/2018/02/19/12306-%E9%AA%8C%E8%AF%81%E7%99%BB%E5%BD%95/")
-
----
-
-
-### Feature
-
-- 余票查询 
-- 验证登录
-- 账号客户信息获取
-- 配置抢票任务（规划中）
 
 ### Installation
 
-1.首先安装
-
-- PHP7
-- Composer
-- Phantomjs
-
-2.加载依赖
-
 ```shell
 composer install
-```
-
-3.配置参数
-
-```shell
-cp auth.json.example auth.json
-
-# 修改配置文件
 ```
 
 ### Usage
