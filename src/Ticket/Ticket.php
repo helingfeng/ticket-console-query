@@ -9,22 +9,7 @@ use GuzzleHttp\Psr7\Request;
 class Ticket
 {
 
-    /**
-     * guzzle 客户端
-     * @var Client|null
-     */
-    protected $client = null;
-
-    /**
-     * 余票接口链接
-     * @var string
-     */
-    protected $queryTicketUrl = 'https://kyfw.12306.cn/otn/leftTicket/queryZ';
-
-    public function __construct()
-    {
-        $this->client = new  Client();
-    }
+    protected $queryTicketUrl = 'https://kyfw.12306.cn/otn/leftTicket/query';
 
     public function queryTickets($from_station, $to_station, $format_date, $purpose_codes = 'ADULT')
     {
@@ -34,14 +19,14 @@ class Ticket
             'leftTicketDTO.to_station' => $to_station,
             'purpose_codes' => $purpose_codes,
         ];
-        $request = new Request('GET', $this->queryTicketUrl . '?' . http_build_query($parameters));
-        $response = $this->client->send($request);
-        $code = $response->getStatusCode();
-        $body = $response->getBody();
-
+        $headers = [
+            'Referer' => 'https://kyfw.12306.cn/otn/leftTicket/init'
+        ];
+        $url = $this->queryTicketUrl . '?' . http_build_query($parameters);
+        $response = $this->curl($url, 'GET', [], $headers);
         // 接口调用成功
-        if ($code == 200) {
-            $result = json_decode($body, true);
+        if ($response['httpCode'] == 200) {
+            $result = json_decode($response['response'], true);
             $train_str_arr = $result['data']['result'];
             $trains = [];
             if (is_array($train_str_arr)) {
@@ -55,7 +40,7 @@ class Ticket
         }
     }
 
-  /**
+    /**
      * 格式化字符串转对象
      *
      * @param $string
@@ -113,5 +98,26 @@ class Ticket
 
         $data['queryLeftNewDTO'] = $train;
         return $data;
+    }
+
+    public function curl($url, $method = 'GET', $params = [], $headers = [])
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+
+        // 不校验证书
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
+
+        return ['httpCode' => $httpCode, 'response' => $response, 'httpTime' => $httpTime];
     }
 }
